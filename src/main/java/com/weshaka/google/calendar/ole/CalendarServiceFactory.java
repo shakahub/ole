@@ -62,12 +62,15 @@ public class CalendarServiceFactory {
     public static Credential authorize() throws IOException {
         // Load client secrets.
         InputStream in = CalendarServiceFactory.class.getResourceAsStream("/client_secret.json");
+        System.out.println(in);
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
                 .setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline").build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        LocalServerReceiver localServerReceiver = new LocalServerReceiver.Builder().setPort(9089).build();//setHost("dev.weshaka.com").
+        System.out.println("Saving credentials...");
+        Credential credential = new AuthorizationCodeInstalledApp(flow, localServerReceiver).authorize("user");
         System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
     }
