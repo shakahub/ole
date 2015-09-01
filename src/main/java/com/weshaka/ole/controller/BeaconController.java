@@ -12,9 +12,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.VndErrors;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.client.util.DateTime;
@@ -27,12 +33,22 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
+import com.weshaka.ole.entity.BeaconSubject;
+import com.weshaka.ole.exceptions.BeaconNotFoundException;
+import com.weshaka.ole.repository.BeaconSubjectRepository;
+import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
 
 /**
  * @author ema
  */
 @RestController
 public class BeaconController {
+
+    @Autowired
+    private BeaconSubjectRepository repository;
+
+    @Autowired
+    private BeaconSubjectRepositoryCustom repositoryCustom;
 
     @RequestMapping("/calendar-events")
     public @ResponseBody List<CalendarEvent> getCalendarEvents() throws IOException {
@@ -131,5 +147,20 @@ public class BeaconController {
             System.out.println(f);
         });
         return m.get(calendarId);
+    }
+
+    @RequestMapping("/beacons/{beaconMacId}")
+    public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
+        return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
+    }
+}
+
+@ControllerAdvice
+class BeaconControllerAdvice {
+    @ResponseBody
+    @ExceptionHandler(BeaconNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    VndErrors beaconNotFoundExceptionHandler(BeaconNotFoundException ex) {
+        return new VndErrors("error", ex.getMessage());
     }
 }

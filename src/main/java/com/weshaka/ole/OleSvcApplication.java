@@ -1,22 +1,14 @@
 package com.weshaka.ole;
 
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.weshaka.ole.entity.Beacon;
-import com.weshaka.ole.entity.BeaconSubject;
-import com.weshaka.ole.entity.BeaconSubjectType;
-import com.weshaka.ole.entity.BeaconType;
-import com.weshaka.ole.entity.Location;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.CustomerRepository;
 
 @SpringBootApplication
-public class OleSvcApplication implements CommandLineRunner {
+public class OleSvcApplication /*implements CommandLineRunner*/ {
 	@Autowired
 	private CustomerRepository customerRepository;
 	
@@ -26,7 +18,7 @@ public class OleSvcApplication implements CommandLineRunner {
 	public static void main(String[] args) {
 		SpringApplication.run(OleSvcApplication.class, args);
 	}
-
+/*
 	@Override
 	public void run(String... arg0) throws Exception {
 		repository.deleteAll();
@@ -39,7 +31,7 @@ public class OleSvcApplication implements CommandLineRunner {
 		beacon1.setColor("BLACK");
 		beacon1.setPowerlevel(1);
 		beacon1.setUpc("12345");
-		beacon1.setMac("888");
+		beacon1.setMac("C1:5C:A0:2A:EC:F0");
 		beacon1.setModel("kkk");
 		
 		Location location = new Location();
@@ -67,5 +59,5 @@ public class OleSvcApplication implements CommandLineRunner {
 		System.out.println();
 
 	}
-
+*/
 }

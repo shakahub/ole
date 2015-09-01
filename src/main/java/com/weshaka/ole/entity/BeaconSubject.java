@@ -10,7 +10,7 @@ public class BeaconSubject {
 	private String name;
 	private BeaconSubjectType beaconSubjectType;
 	private Location location;
-	private Optional<Beacon> beacon;
+	private Beacon beacon;
 
 	public BeaconSubject() {
 
@@ -32,12 +32,12 @@ public class BeaconSubject {
 		this.id = id;
 	}
 
-	public Optional<Beacon> getBeacon() {
+	public Beacon getBeacon() {
 		return beacon;
 	}
 
 	public void setBeacon(Beacon beacon) {
-		this.beacon = Optional.of(beacon);
+		this.beacon = beacon;
 	}
 
 	public BeaconSubjectType getBeaconSubjectType() {
