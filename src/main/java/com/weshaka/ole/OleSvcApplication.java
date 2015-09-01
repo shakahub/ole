@@ -57,7 +57,6 @@ public class OleSvcApplication /*implements CommandLineRunner*/ {
 			System.out.println(beaconSubject);
 		}
 		System.out.println();
-
 	}
 */
 }
