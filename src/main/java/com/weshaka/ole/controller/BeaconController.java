@@ -151,6 +151,7 @@ public class BeaconController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
+        //TODO: add validation logic to the beacon mac id
         return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
     }
 }
