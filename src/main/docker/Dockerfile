@@ -1,4 +1,4 @@
-FROM java:oracle-java8
+FROM java:8
 MAINTAINER Ethan Ma <yixing.ma@gmail.com>
 ADD ole-svc-1.0.0.jar /app/ole-svc-1.0.0.jar
 EXPOSE 8080 9089
