@@ -88,8 +88,6 @@ public class CalendarServiceFactory {
 //        Credential credential = new AuthorizationCodeInstalledApp(flow, localServerReceiver).authorize("user");
 //        System.out.println("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
         return credential;
-        
-       
     }
     
     /**
