@@ -35,6 +35,7 @@ import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
 import com.weshaka.ole.entity.BeaconSubject;
+import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
@@ -152,10 +153,11 @@ public class BeaconController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        //TODO: add validation logic to the beacon mac id + unit test
-        Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
         System.out.printf("beaconMacId %s",beaconMacId);
-        System.out.println("regex validate:"+validateBeaconMacId.test(beaconMacId));
+        Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
+        if(!validateBeaconMacId.test(beaconMacId)){
+            throw new BeaconMacIdNotValidException(beaconMacId);
+        }
         return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
     }
 }
@@ -167,5 +169,12 @@ class BeaconControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     VndErrors beaconNotFoundExceptionHandler(BeaconNotFoundException ex) {
         return new VndErrors("error", ex.getMessage());
+    }
+    @ResponseBody
+    @ExceptionHandler(BeaconMacIdNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    VndErrors beaconMacIdNotValidHandler(BeaconMacIdNotValidException ex) {
+        VndErrors vndErrors = new VndErrors("error", ex.getMessage());
+        return vndErrors;
     }
 }
