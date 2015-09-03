@@ -152,8 +152,9 @@ public class BeaconController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        //TODO: add validation logic to the beacon mac id
-        Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}[:[A-Za-z0-9]{2}]{5}");};
+        //TODO: add validation logic to the beacon mac id + unit test
+        Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
+        System.out.printf("beaconMacId %s",beaconMacId);
         System.out.println("regex validate:"+validateBeaconMacId.test(beaconMacId));
         return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
     }
