@@ -34,9 +34,11 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
+import com.weshaka.ole.annotations.LoggingInfo;
 import com.weshaka.ole.entity.BeaconSubject;
 import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
+import com.weshaka.ole.funcinf.Info;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
 
@@ -45,6 +47,9 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  */
 @RestController
 public class BeaconController {
+    
+    @LoggingInfo
+    Info info;
 
     @Autowired
     private BeaconSubjectRepository repository;
@@ -153,7 +158,7 @@ public class BeaconController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        System.out.printf("beaconMacId %s",beaconMacId);
+        info.print("beaconMacId {}",beaconMacId);
         Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
         if(!validateBeaconMacId.test(beaconMacId)){
             throw new BeaconMacIdNotValidException(beaconMacId);
