@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
@@ -48,8 +49,8 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
 @RestController
 public class BeaconController {
     
-    @LoggingInfo
-    Info info;
+    //@LoggingInfo
+    Info info=LoggerFactory.getLogger(BeaconController.class)::info;
 
     @Autowired
     private BeaconSubjectRepository repository;
