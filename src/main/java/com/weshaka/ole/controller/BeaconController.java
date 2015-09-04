@@ -47,7 +47,6 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  * @author ema
  */
 @RestController
-@DependsOn("loggingAnnotationBeanPostProcessor")
 public class BeaconController {
     
     @LoggingInfo
