@@ -44,7 +44,7 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  * @author ema
  */
 @RestController
-public class BeaconController extends CommonController{
+public class BeaconController extends CommonController {
 
     @Autowired
     private BeaconSubjectRepository repository;
@@ -65,9 +65,9 @@ public class BeaconController extends CommonController{
         List<Event> items = events.getItems();
         List<CalendarEvent> calendarEvents = new ArrayList<>();
         if (items.size() == 0) {
-            System.out.println("No upcoming events found.");
+            debug.print("No upcoming events found for {}", "default primary");
         } else {
-            System.out.println("Upcoming events");
+            debug.print("Upcoming events {}", "default primary");
             items.forEach(event -> {
                 CalendarEvent e = new CalendarEvent();
                 DateTime start = event.getStart().getDateTime();
@@ -92,17 +92,16 @@ public class BeaconController extends CommonController{
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
         com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
-        System.out.printf("CalendarId: %s", calendarId);
-        System.out.println("");
+        debug.print("CalendarId={}", calendarId);
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
         Events events = service.events().list(calendarId).setMaxResults(10).setTimeMin(now).setOrderBy("startTime").setSingleEvents(true).execute();
         List<Event> items = events.getItems();
         List<CalendarEvent> calendarEvents = new ArrayList<>();
         if (items.size() == 0) {
-            System.out.println("No upcoming events found.");
+            debug.print("No upcoming events found for {}", calendarId);
         } else {
-            System.out.println("Upcoming events for " + calendarId);
+            debug.print("Upcoming events for {}", calendarId);
             items.forEach(event -> {
                 CalendarEvent e = new CalendarEvent();
                 DateTime start = event.getStart().getDateTime();
@@ -127,8 +126,7 @@ public class BeaconController extends CommonController{
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
         com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
-        System.out.printf("CalendarId: %s", calendarId);
-        System.out.println("");
+        debug.print("CalendarId={}", calendarId);
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
         LocalDateTime localDt = LocalDateTime.ofInstant((new Date(now.getValue())).toInstant(), ZoneId.systemDefault());
@@ -145,17 +143,19 @@ public class BeaconController extends CommonController{
         FreeBusyResponse fbres = service.freebusy().query(fbreq).execute();
         Map<String, FreeBusyCalendar> m = fbres.getCalendars();
         m.forEach((s, f) -> {
-            System.out.println(s);
-            System.out.println(f);
+            debug.print("s={}", s);
+            debug.print("f={}", f);
         });
         return m.get(calendarId);
     }
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        debug.print("beaconMacId={}",beaconMacId);
-        Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
-        if(!validateBeaconMacId.test(beaconMacId)){
+        debug.print("beaconMacId={}", beaconMacId);
+        Predicate<String> validateBeaconMacId = (String macId) -> {
+            return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");
+        };
+        if (!validateBeaconMacId.test(beaconMacId)) {
             throw new BeaconMacIdNotValidException(beaconMacId);
         }
         return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
@@ -170,6 +170,7 @@ class BeaconControllerAdvice {
     VndErrors beaconNotFoundExceptionHandler(BeaconNotFoundException ex) {
         return new VndErrors("error", ex.getMessage());
     }
+
     @ResponseBody
     @ExceptionHandler(BeaconMacIdNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
