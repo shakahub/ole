@@ -3,11 +3,13 @@ package com.weshaka.ole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.CustomerRepository;
 
 @SpringBootApplication
+@ComponentScan({"com.weshaka.framework","com.weshaka.ole"})
 public class OleSvcApplication /*implements CommandLineRunner*/ {
 	@Autowired
 	private CustomerRepository customerRepository;
