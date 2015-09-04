@@ -1,6 +1,7 @@
 package com.weshaka.framework.beans;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -24,12 +25,15 @@ public class LoggingAnnotationBeanPostProcessor implements MergedBeanDefinitionP
     }
 
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        Field[] fields = bean.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (field.getAnnotation(LoggingInfo.class) != null) {
-                injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(field.getDeclaringClass())::info);
-            } else if (field.getAnnotation(LoggingDebug.class) != null) {
-                injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(field.getDeclaringClass())::debug);
+        Class<?> superClass = bean.getClass().getSuperclass();
+        if(superClass!=null){
+            Field[] fields = superClass.getDeclaredFields();
+            for (Field field : fields) {
+                if (field.getAnnotation(LoggingInfo.class) != null) {
+                    injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(bean.getClass())::info);
+                } else if (field.getAnnotation(LoggingDebug.class) != null) {
+                    injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(bean.getClass())::debug);
+                }
             }
         }
         return bean;

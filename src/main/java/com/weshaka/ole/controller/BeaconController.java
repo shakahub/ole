@@ -45,7 +45,7 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  */
 @RestController
 public class BeaconController extends CommonController {
-
+    
     @Autowired
     private BeaconSubjectRepository repository;
 
