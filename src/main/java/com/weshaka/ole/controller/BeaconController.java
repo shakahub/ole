@@ -35,6 +35,7 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
+import com.weshaka.ole.annotations.LoggingInfo;
 import com.weshaka.ole.entity.BeaconSubject;
 import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
@@ -46,10 +47,10 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  * @author ema
  */
 @RestController
-@DependsOn("LoggingAnnotationBeanPostProcessor")
+@DependsOn("loggingAnnotationBeanPostProcessor")
 public class BeaconController {
     
-    //@LoggingInfo
+    @LoggingInfo
     Info info;
 
     @Autowired

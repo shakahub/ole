@@ -17,7 +17,7 @@ import com.weshaka.ole.funcinf.Info;
  * 
  * @author ema
  */
-@Component("LoggingAnnotationBeanPostProcessor")
+@Component("loggingAnnotationBeanPostProcessor")
 public class LoggingAnnotationBeanPostProcessor implements MergedBeanDefinitionPostProcessor {
     public void postProcessMergedBeanDefinition(RootBeanDefinition rootBeanDefinition, Class<?> beanType, String beanName) {
     }
