@@ -1,6 +1,6 @@
 package com.weshaka.ole.funcinf;
 
 @FunctionalInterface
-public interface Info {
+public interface LoggingPrinter {
     public void print(String format, Object... args);
 }

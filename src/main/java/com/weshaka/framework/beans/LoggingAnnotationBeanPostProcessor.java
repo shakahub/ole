@@ -9,8 +9,9 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 
+import com.weshaka.ole.annotations.LoggingDebug;
 import com.weshaka.ole.annotations.LoggingInfo;
-import com.weshaka.ole.funcinf.Info;
+import com.weshaka.ole.funcinf.LoggingPrinter;
 
 /**
  * User: Alexis Hassler
@@ -26,15 +27,17 @@ public class LoggingAnnotationBeanPostProcessor implements MergedBeanDefinitionP
         Field[] fields = bean.getClass().getDeclaredFields();
         for (Field field : fields) {
             if (field.getAnnotation(LoggingInfo.class) != null) {
-                injectInfoLogger(bean, field);
+                injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(field.getDeclaringClass())::info);
+            } else if (field.getAnnotation(LoggingDebug.class) != null) {
+                injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(field.getDeclaringClass())::debug);
             }
         }
         return bean;
     }
 
-    private void injectInfoLogger(Object bean, Field field) {
+    private void injectInfoLogger(Object bean, Field field, LoggingPrinter info) {
         ReflectionUtils.makeAccessible(field);
-        ReflectionUtils.setField(field, bean, (Info)LoggerFactory.getLogger(field.getDeclaringClass())::info);
+        ReflectionUtils.setField(field, bean, info);
     }
 
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {

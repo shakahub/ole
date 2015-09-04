@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,11 +34,9 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
-import com.weshaka.ole.annotations.LoggingInfo;
 import com.weshaka.ole.entity.BeaconSubject;
 import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
-import com.weshaka.ole.funcinf.Info;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
 
@@ -47,10 +44,7 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  * @author ema
  */
 @RestController
-public class BeaconController {
-    
-    @LoggingInfo
-    Info info;
+public class BeaconController extends CommonController{
 
     @Autowired
     private BeaconSubjectRepository repository;
@@ -159,7 +153,7 @@ public class BeaconController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        info.print("beaconMacId={}",beaconMacId);
+        debug.print("beaconMacId={}",beaconMacId);
         Predicate<String> validateBeaconMacId = (String macId) -> {return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");};
         if(!validateBeaconMacId.test(beaconMacId)){
             throw new BeaconMacIdNotValidException(beaconMacId);
