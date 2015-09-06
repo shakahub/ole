@@ -5,54 +5,63 @@ import java.util.Optional;
 import org.springframework.data.annotation.Id;
 
 public class BeaconSubject {
-	@Id
-	private String id;
-	private String name;
-	private BeaconSubjectType beaconSubjectType;
-	private Location location;
-	private Beacon beacon;
+    @Id
+    private String id;
+    private String name;
+    private BeaconSubjectType beaconSubjectType;
+    private Location location;
+    private Beacon beacon;
+    private String businessId;
 
-	public BeaconSubject() {
+    public String getBusinessId() {
+        return businessId;
+    }
 
-	}
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public BeaconSubject() {
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public Beacon getBeacon() {
-		return beacon;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setBeacon(Beacon beacon) {
-		this.beacon = beacon;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public BeaconSubjectType getBeaconSubjectType() {
-		return beaconSubjectType;
-	}
+    public Beacon getBeacon() {
+        return beacon;
+    }
 
-	public void setBeaconSubjectType(BeaconSubjectType beaconSubjectType) {
-		this.beaconSubjectType = beaconSubjectType;
-	}
+    public void setBeacon(Beacon beacon) {
+        this.beacon = beacon;
+    }
 
-	public Location getLocation() {
-		return location;
-	}
+    public BeaconSubjectType getBeaconSubjectType() {
+        return beaconSubjectType;
+    }
 
-	public void setLocation(Location location) {
-		this.location = location;
-	}
+    public void setBeaconSubjectType(BeaconSubjectType beaconSubjectType) {
+        this.beaconSubjectType = beaconSubjectType;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
 }

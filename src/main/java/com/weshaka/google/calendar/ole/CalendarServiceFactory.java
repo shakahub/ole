@@ -4,9 +4,12 @@
 package com.weshaka.google.calendar.ole;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,6 +17,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeRequestUrl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
@@ -42,7 +46,13 @@ public class CalendarServiceFactory {
     private static HttpTransport HTTP_TRANSPORT;
 
     /** Global instance of the scopes required by this quickstart. */
-    private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR_READONLY);
+    private static final List<String> SCOPES = Arrays.asList(CalendarScopes.CALENDAR);
+    
+    /** Service account ID.*/
+    private static final String SERVICE_ACCOUNT_ID="729979937520-86k2ufd1rs6e2h84rf18hgmjjth2sv4a@developer.gserviceaccount.com";
+    
+    /** Service account impersonate user ID.*/
+    private static final String SERVICE_ACCOUNT_IMPERS_USER_ID="admin@weshaka.com";
 
     private static final String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
     
@@ -97,7 +107,6 @@ public class CalendarServiceFactory {
         try {
             // Load client secrets.
             InputStream in = CalendarServiceFactory.class.getResourceAsStream("/client_secret.json");
-            System.out.println(in);
             GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
             return clientSecrets;
         } catch (Exception e) {
@@ -135,10 +144,26 @@ public class CalendarServiceFactory {
      * 
      * @return an authorized Calendar client service
      * @throws IOException
+     * @throws GeneralSecurityException 
      */
-    public static com.google.api.services.calendar.Calendar getCalendarService() throws IOException {
-        Credential credential = authorize();
+    public static com.google.api.services.calendar.Calendar getCalendarService() throws IOException, GeneralSecurityException {
+        //Credential credential = authorize(); //Alternate use 3 legs flow.
+        Credential credential = authorizeWithServiceAccount();
         return new com.google.api.services.calendar.Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
                 .build();
+    }
+    
+    static Credential authorizeWithServiceAccount() throws IOException, GeneralSecurityException{
+        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+        // Build service account credential.
+        String in = CalendarServiceFactory.class.getResource("/shaka-ole-ff5f1899560a.p12").getPath();
+        GoogleCredential credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT)
+            .setJsonFactory(jsonFactory)
+            .setServiceAccountId(SERVICE_ACCOUNT_ID)
+            .setServiceAccountUser(SERVICE_ACCOUNT_IMPERS_USER_ID)
+            .setServiceAccountScopes(SCOPES)
+            .setServiceAccountPrivateKeyFromP12File(new File(in))
+            .build();
+        return credential;
     }
 }

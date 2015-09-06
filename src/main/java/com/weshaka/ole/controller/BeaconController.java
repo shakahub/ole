@@ -4,6 +4,7 @@
 package com.weshaka.ole.controller;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
  */
 @RestController
 public class BeaconController extends CommonController {
-    
+
     @Autowired
     private BeaconSubjectRepository repository;
 
@@ -53,12 +55,11 @@ public class BeaconController extends CommonController {
     private BeaconSubjectRepositoryCustom repositoryCustom;
 
     @RequestMapping("/calendar-events")
-    public @ResponseBody List<CalendarEvent> getCalendarEvents() throws IOException {
+    public @ResponseBody List<CalendarEvent> getCalendarEventsAPI() throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
         com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
-
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
         Events events = service.events().list("primary").setMaxResults(10).setTimeMin(now).setOrderBy("startTime").setSingleEvents(true).execute();
@@ -73,8 +74,9 @@ public class BeaconController extends CommonController {
                 DateTime start = event.getStart().getDateTime();
                 if (start == null) {
                     start = event.getStart().getDate();
-                    e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
                 }
+                debug.print("eventStart={}" + start);
+                e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
                 List<EventAttendee> attendees = event.getAttendees();
                 if (attendees != null)
                     e.getEventAttendees().addAll(attendees);
@@ -87,7 +89,8 @@ public class BeaconController extends CommonController {
     }
 
     @RequestMapping("/calendar-events/{calendarId:.+}")
-    public @ResponseBody List<CalendarEvent> getCalendarEventsByCalendarId(@PathVariable("calendarId") String calendarId) throws IOException {
+    public @ResponseBody List<CalendarEvent> getCalendarEventsByCalendarIdAPI(@PathVariable("calendarId") String calendarId) throws IOException,
+            GeneralSecurityException {
         // Build a new authorized API client service.
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
@@ -107,8 +110,8 @@ public class BeaconController extends CommonController {
                 DateTime start = event.getStart().getDateTime();
                 if (start == null) {
                     start = event.getStart().getDate();
-                    e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
                 }
+                e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
                 List<EventAttendee> attendees = event.getAttendees();
                 if (attendees != null)
                     e.getEventAttendees().addAll(attendees);
@@ -121,7 +124,29 @@ public class BeaconController extends CommonController {
     }
 
     @RequestMapping("/calendar-events/{calendarId:.+}/free-busy")
-    public @ResponseBody FreeBusyCalendar getCalendarEventsFreeBusyByCalendarId(@PathVariable("calendarId") String calendarId) throws IOException {
+    public @ResponseBody FreeBusyCalendar getCalendarEventsFreeBusyByCalendarIdAPI(@PathVariable("calendarId") String calendarId) throws IOException,
+            GeneralSecurityException {
+        return getCalendarEventsFreeBusyByCalendarId(calendarId);
+    }
+
+    @RequestMapping("/beacons/{beaconMacId}")
+    public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
+        return getBeaconSubjectByBeaconMacId(beaconMacId);
+    }
+
+    @RequestMapping("/beacons/{beaconMacId}/calendar-events/free-busy")
+    public @ResponseBody FreeBusyCalendar getCalendarEventsFreeBusyByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId)
+            throws IOException, GeneralSecurityException {
+        BeaconSubject beaconSubject = getBeaconSubjectByBeaconMacId(beaconMacId);
+        String beaconSubjectBusinessId = getBeaconSubjectBusinessId(beaconSubject).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));// TODO:
+                                                                                                                                               // change
+                                                                                                                                               // to
+                                                                                                                                               // businessIdNotFound
+                                                                                                                                               // exception
+        return getCalendarEventsFreeBusyByCalendarId(beaconSubjectBusinessId);
+    }
+
+    private FreeBusyCalendar getCalendarEventsFreeBusyByCalendarId(String calendarId) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
@@ -142,15 +167,10 @@ public class BeaconController extends CommonController {
         fbreq.setItems(fbreqItems);
         FreeBusyResponse fbres = service.freebusy().query(fbreq).execute();
         Map<String, FreeBusyCalendar> m = fbres.getCalendars();
-        m.forEach((s, f) -> {
-            debug.print("s={}", s);
-            debug.print("f={}", f);
-        });
         return m.get(calendarId);
     }
 
-    @RequestMapping("/beacons/{beaconMacId}")
-    public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacId(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
+    private BeaconSubject getBeaconSubjectByBeaconMacId(String beaconMacId) {
         debug.print("beaconMacId={}", beaconMacId);
         Predicate<String> validateBeaconMacId = (String macId) -> {
             return macId.matches("[A-Za-z0-9]{2}(:[A-Za-z0-9]{2}){5}");
@@ -159,6 +179,15 @@ public class BeaconController extends CommonController {
             throw new BeaconMacIdNotValidException(beaconMacId);
         }
         return repositoryCustom.findBeaconSubjectByBeaconMac(beaconMacId).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));
+    }
+
+    private Optional<String> getBeaconSubjectBusinessId(BeaconSubject beaconSubject) {
+        debug.print("beaconSubject={}", beaconSubject);
+        String businessId = null;
+        if (beaconSubject != null) {
+            businessId = beaconSubject.getBusinessId();
+        }
+        return Optional.ofNullable(businessId);
     }
 }
 
