@@ -141,8 +141,7 @@ public class BeaconController extends CommonController {
         String beaconSubjectBusinessId = getBeaconSubjectBusinessId(beaconSubject).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));// TODO:
                                                                                                                                                // change
                                                                                                                                                // to
-                                                                                                                                               // businessIdNotFound
-                                                                                                                                               // exception
+                                                                                                                                               // businessIdNotFound                                                                                                                                        // exception
         return getCalendarEventsFreeBusyByCalendarId(beaconSubjectBusinessId);
     }
 
