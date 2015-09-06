@@ -131,7 +131,9 @@ public class BeaconController extends CommonController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        return getBeaconSubjectByBeaconMacId(beaconMacId);
+        BeaconSubject beaconSubject =  getBeaconSubjectByBeaconMacId(beaconMacId);
+        beaconSubject.setId("TestID001");
+        return beaconSubject;
     }
 
     @RequestMapping("/beacons/{beaconMacId}/calendar-events/free-busy")
