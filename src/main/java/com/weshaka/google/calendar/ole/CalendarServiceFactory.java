@@ -8,8 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.security.PrivateKey;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +23,7 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.SecurityUtils;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
 
@@ -156,13 +157,18 @@ public class CalendarServiceFactory {
     static Credential authorizeWithServiceAccount() throws IOException, GeneralSecurityException{
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         // Build service account credential.
-        String in = CalendarServiceFactory.class.getResource("/shaka-ole-ff5f1899560a.p12").getPath();
+        //String in = CalendarServiceFactory.class.getResource("/shaka-ole-ff5f1899560a.p12").getPath();
+        InputStream in = CalendarServiceFactory.class.getResourceAsStream("/shaka-ole-ff5f1899560a.p12");
+        PrivateKey pk = SecurityUtils.loadPrivateKeyFromKeyStore(
+                SecurityUtils.getPkcs12KeyStore(), in, "notasecret",
+                "privatekey", "notasecret");
         GoogleCredential credential = new GoogleCredential.Builder().setTransport(HTTP_TRANSPORT)
             .setJsonFactory(jsonFactory)
             .setServiceAccountId(SERVICE_ACCOUNT_ID)
             .setServiceAccountUser(SERVICE_ACCOUNT_IMPERS_USER_ID)
             .setServiceAccountScopes(SCOPES)
-            .setServiceAccountPrivateKeyFromP12File(new File(in))
+            //.setServiceAccountPrivateKeyFromP12File(new File(in))
+            .setServiceAccountPrivateKey(pk)
             .build();
         return credential;
     }
