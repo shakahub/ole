@@ -37,6 +37,7 @@ import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
 import com.weshaka.ole.entity.BeaconSubject;
+import com.weshaka.ole.exceptions.BeaconBusinessIDNotFoundException;
 import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
@@ -138,10 +139,7 @@ public class BeaconController extends CommonController {
     public @ResponseBody FreeBusyCalendar getCalendarEventsFreeBusyByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId)
             throws IOException, GeneralSecurityException {
         BeaconSubject beaconSubject = getBeaconSubjectByBeaconMacId(beaconMacId);
-        String beaconSubjectBusinessId = getBeaconSubjectBusinessId(beaconSubject).orElseThrow(() -> new BeaconNotFoundException(beaconMacId));// TODO:
-                                                                                                                                               // change
-                                                                                                                                               // to
-                                                                                                                                               // businessIdNotFound                                                                                                                                        // exception
+        String beaconSubjectBusinessId = getBeaconSubjectBusinessId(beaconSubject).orElseThrow(() -> new BeaconBusinessIDNotFoundException(beaconMacId));                                                                                                                                      // exception
         return getCalendarEventsFreeBusyByCalendarId(beaconSubjectBusinessId);
     }
 
@@ -206,4 +204,12 @@ class BeaconControllerAdvice {
         VndErrors vndErrors = new VndErrors("error", ex.getMessage());
         return vndErrors;
     }
+    
+    @ResponseBody
+    @ExceptionHandler(BeaconBusinessIDNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    VndErrors beaconBusinessIDNotFoundExceptionHandler(BeaconBusinessIDNotFoundException ex) {
+        return new VndErrors("error", ex.getMessage());
+    }
+    
 }
