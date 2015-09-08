@@ -7,7 +7,7 @@ import com.weshaka.ole.funcinf.LoggingPrinter;
 public class CommonController {
     @LoggingInfo
     LoggingPrinter info;
-    
+
     @LoggingDebug
     LoggingPrinter debug;
 }

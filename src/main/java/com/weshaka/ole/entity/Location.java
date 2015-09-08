@@ -1,56 +1,54 @@
 package com.weshaka.ole.entity;
 
 public class Location {
-	private double longitude;
-	private double latitude;
-	private String city;
-	private String state;
-	private String country;
+    private double longitude;
+    private double latitude;
+    private String city;
+    private String state;
+    private String country;
 
-	@Override
-	public String toString() {
-		return String
-				.format("Location[longitude=%s,latitude=%s,city=%s,state=%s,country=%s]",
-						longitude, latitude, city, state, country);
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public double getLongitude() {
-		return longitude;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
+    public double getLatitude() {
+        return latitude;
+    }
 
-	public double getLatitude() {
-		return latitude;
-	}
+    public double getLongitude() {
+        return longitude;
+    }
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
+    public String getState() {
+        return state;
+    }
 
-	public String getCity() {
-		return city;
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-	public void setCity(String city) {
-		this.city = city;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public String getState() {
-		return state;
-	}
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
 
-	public void setState(String state) {
-		this.state = state;
-	}
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    @Override
+    public String toString() {
+        return String.format("Location[longitude=%s,latitude=%s,city=%s,state=%s,country=%s]", longitude, latitude, city, state, country);
+    }
 }

@@ -1,7 +1,6 @@
 package com.weshaka.framework.beans;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -16,19 +15,27 @@ import com.weshaka.ole.funcinf.LoggingPrinter;
 
 /**
  * User: Alexis Hassler
- * 
+ *
  * @author ema
  */
 @Component("loggingAnnotationBeanPostProcessor")
 public class LoggingAnnotationBeanPostProcessor implements MergedBeanDefinitionPostProcessor {
-    public void postProcessMergedBeanDefinition(RootBeanDefinition rootBeanDefinition, Class<?> beanType, String beanName) {
+    private void injectInfoLogger(Object bean, Field field, LoggingPrinter info) {
+        ReflectionUtils.makeAccessible(field);
+        ReflectionUtils.setField(field, bean, info);
     }
 
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        Class<?> superClass = bean.getClass().getSuperclass();
-        if(superClass!=null){
-            Field[] fields = superClass.getDeclaredFields();
-            for (Field field : fields) {
+        final Class<?> superClass = bean.getClass().getSuperclass();
+        if (superClass != null) {
+            final Field[] fields = superClass.getDeclaredFields();
+            for (final Field field : fields) {
                 if (field.getAnnotation(LoggingInfo.class) != null) {
                     injectInfoLogger(bean, field, (LoggingPrinter) LoggerFactory.getLogger(bean.getClass())::info);
                 } else if (field.getAnnotation(LoggingDebug.class) != null) {
@@ -39,12 +46,7 @@ public class LoggingAnnotationBeanPostProcessor implements MergedBeanDefinitionP
         return bean;
     }
 
-    private void injectInfoLogger(Object bean, Field field, LoggingPrinter info) {
-        ReflectionUtils.makeAccessible(field);
-        ReflectionUtils.setField(field, bean, info);
-    }
-
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    @Override
+    public void postProcessMergedBeanDefinition(RootBeanDefinition rootBeanDefinition, Class<?> beanType, String beanName) {
     }
 }

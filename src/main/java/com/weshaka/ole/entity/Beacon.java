@@ -1,87 +1,82 @@
 package com.weshaka.ole.entity;
 
-import org.springframework.data.annotation.Id;
-
 public class Beacon {
-	@Id
-	private String id;
-	private String brand;
-	private BeaconType beaconType;
-	private String upc;
-	private double powerlevel;
-	private String mac;
-	private String model;
-	private String color;
 
-	public String getId() {
-		return id;
-	}
+    private String beaconId;
+    private String brand;
+    private BeaconType beaconType;
+    private String upc;
+    private double powerlevel;
+    private String mac;
+    private String model;
+    private String color;
 
-	public BeaconType getBeaconType() {
-		return beaconType;
-	}
+    public String getBeaconId() {
+        return beaconId;
+    }
 
-	public void setBeaconType(BeaconType beaconType) {
-		this.beaconType = beaconType;
-	}
+    public BeaconType getBeaconType() {
+        return beaconType;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public String getBrand() {
+        return brand;
+    }
 
-	public String getBrand() {
-		return brand;
-	}
+    public String getColor() {
+        return color;
+    }
 
-	public void setBrand(String brand) {
-		this.brand = brand;
-	}
+    public String getMac() {
+        return mac;
+    }
 
-	public String getUpc() {
-		return upc;
-	}
+    public String getModel() {
+        return model;
+    }
 
-	public void setUpc(String upc) {
-		this.upc = upc;
-	}
+    public double getPowerlevel() {
+        return powerlevel;
+    }
 
-	public double getPowerlevel() {
-		return powerlevel;
-	}
+    public String getUpc() {
+        return upc;
+    }
 
-	public void setPowerlevel(double powerlevel) {
-		this.powerlevel = powerlevel;
-	}
+    public void setBeaconId(String beaconId) {
+        this.beaconId = beaconId;
+    }
 
-	public String getMac() {
-		return mac;
-	}
+    public void setBeaconType(BeaconType beaconType) {
+        this.beaconType = beaconType;
+    }
 
-	public void setMac(String mac) {
-		this.mac = mac;
-	}
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 
-	public String getModel() {
-		return model;
-	}
+    public void setColor(String color) {
+        this.color = color;
+    }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+    public void setMac(String mac) {
+        this.mac = mac;
+    }
 
-	public String getColor() {
-		return color;
-	}
+    public void setModel(String model) {
+        this.model = model;
+    }
 
-	public void setColor(String color) {
-		this.color = color;
-	}
+    public void setPowerlevel(double powerlevel) {
+        this.powerlevel = powerlevel;
+    }
 
-	@Override
-	public String toString() {
-		return String
-				.format("Beacon[id=%s,brand=%s,model=%s,type=%s,upc=%s,powerlevel=%d,mac=%s,color=%s]",
-						id, brand, model, beaconType, upc, powerlevel, mac,
-						color);
-	}
+    public void setUpc(String upc) {
+        this.upc = upc;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Beacon[beaconId=%s,brand=%s,model=%s,type=%s,upc=%s,powerlevel=%d,mac=%s,color=%s]", beaconId, brand, model, beaconType, upc, powerlevel, mac, color);
+    }
 }

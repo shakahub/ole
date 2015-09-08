@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.weshaka.ole.repository;
 
@@ -9,7 +9,6 @@ import com.weshaka.ole.entity.BeaconSubject;
 
 /**
  * @author ema
- *
  */
 public interface BeaconSubjectRepositoryCustom {
     public Optional<BeaconSubject> findBeaconSubjectByBeaconMac(String macId);

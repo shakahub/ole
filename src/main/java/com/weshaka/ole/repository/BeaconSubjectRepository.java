@@ -6,6 +6,6 @@ import com.weshaka.ole.entity.BeaconSubject;
 
 public interface BeaconSubjectRepository extends MongoRepository<BeaconSubject, String> {
 
-	public BeaconSubject findById(String id);
+    public BeaconSubject findById(String id);
 
 }

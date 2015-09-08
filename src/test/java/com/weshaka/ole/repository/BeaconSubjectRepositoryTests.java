@@ -33,21 +33,21 @@ import com.weshaka.ole.entity.BeaconSubject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OleSvcApplication.class, loader = SpringApplicationContextLoader.class)
-@ActiveProfiles({"prod","test"})
+@ActiveProfiles({ "prod", "test" })
 public class BeaconSubjectRepositoryTests {
     @Profile("test")
     @Configuration
     @EnableMongoRepositories
     static class MongoDbTestConfig extends AbstractMongoConfiguration {
+        @Override
+        protected String getDatabaseName() {
+            return "ole-svc-test";
+        }
+
         @Bean
         @Override
         public Mongo mongo() {
             return new Fongo("InMemoryMongo").getMongo();
-        }
-
-        @Override
-        protected String getDatabaseName() {
-            return "ole-svc-test";
         }
     }
 
@@ -62,23 +62,23 @@ public class BeaconSubjectRepositoryTests {
 
     @Autowired
     private BeaconSubjectRepositoryCustom beaconSubjectRepositoryCustom;
-    
+
     @Autowired
     private BeaconSubjectRepository beaconSubjectRepository;
 
     @Test
-    @UsingDataSet(locations = {"/Beacon_subject_1.json"}, loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = { "/Beacon_subject_1.json" }, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectByBeaconMac() {
-        Optional<BeaconSubject> beaconSubject = beaconSubjectRepositoryCustom.findBeaconSubjectByBeaconMac("C1:5C:A0:2A:EC:F0");
+        final Optional<BeaconSubject> beaconSubject = beaconSubjectRepositoryCustom.findBeaconSubjectByBeaconMac("C1:5C:A0:2A:EC:F0");
         System.out.println(beaconSubject.get().getBusinessId());
         assertNotNull(beaconSubject);
     }
-    
+
     @Test
-    @UsingDataSet(locations = {"/Beacon_subject_2.json"}, loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = { "/Beacon_subject_2.json" }, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectById() {
-        BeaconSubject beaconSubject = beaconSubjectRepository.findOne("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d");
-        System.out.println("beaconSubject="+beaconSubject);
-        //assertNotNull(beaconSubject);
+        final BeaconSubject beaconSubject = beaconSubjectRepository.findOne("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d");
+        System.out.println("beaconSubject=" + beaconSubject);
+        // assertNotNull(beaconSubject);
     }
 }

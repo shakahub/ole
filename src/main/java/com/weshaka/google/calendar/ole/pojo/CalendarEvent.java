@@ -10,26 +10,31 @@ public class CalendarEvent {
     private String summary;
     private LocalDateTime startDateTime;
     private List<EventAttendee> eventAttendees;
-    
+
     public List<EventAttendee> getEventAttendees() {
-        if(eventAttendees==null){
+        if (eventAttendees == null) {
             this.eventAttendees = new ArrayList<>();
         }
         return this.eventAttendees;
     }
-    public void setEventAttendees(List<EventAttendee> eventAttendees) {
-        this.eventAttendees = eventAttendees;
-    }
-    public String getSummary() {
-        return summary;
-    }
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
+
     public LocalDateTime getStartDateTime() {
         return startDateTime;
     }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setEventAttendees(List<EventAttendee> eventAttendees) {
+        this.eventAttendees = eventAttendees;
+    }
+
     public void setStartDateTime(LocalDateTime startDateTime) {
         this.startDateTime = startDateTime;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }
