@@ -11,7 +11,7 @@ import com.weshaka.ole.repository.CustomerRepository;
 
 @SpringBootApplication
 @ComponentScan({"com.weshaka.framework","com.weshaka.ole"})
-@Profile("production")
+@Profile("prod")
 public class OleSvcApplication /*implements CommandLineRunner*/ {
 	@Autowired
 	private CustomerRepository customerRepository;

@@ -33,7 +33,7 @@ import com.weshaka.ole.entity.BeaconSubject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = OleSvcApplication.class, loader = SpringApplicationContextLoader.class)
-@ActiveProfiles({ "test", "production" })
+@ActiveProfiles({"prod","test"})
 public class BeaconSubjectRepositoryTests {
     @Profile("test")
     @Configuration
