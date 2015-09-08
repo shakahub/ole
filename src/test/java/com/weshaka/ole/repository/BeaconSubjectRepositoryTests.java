@@ -67,7 +67,7 @@ public class BeaconSubjectRepositoryTests {
     private BeaconSubjectRepository beaconSubjectRepository;
 
     @Test
-    @UsingDataSet(locations = {"Beacon_subject_1.json"}, loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = {"/Beacon_subject_1.json"}, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectByBeaconMac() {
         Optional<BeaconSubject> beaconSubject = beaconSubjectRepositoryCustom.findBeaconSubjectByBeaconMac("C1:5C:A0:2A:EC:F0");
         System.out.println(beaconSubject.get().getBusinessId());
@@ -75,7 +75,7 @@ public class BeaconSubjectRepositoryTests {
     }
     
     @Test
-    @UsingDataSet(locations = {"Beacon_subject_2.json"}, loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = {"/Beacon_subject_2.json"}, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectById() {
         BeaconSubject beaconSubject = beaconSubjectRepository.findOne("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d");
         System.out.println("beaconSubject="+beaconSubject);
