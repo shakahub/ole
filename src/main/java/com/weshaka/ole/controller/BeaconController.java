@@ -132,7 +132,8 @@ public class BeaconController extends CommonController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        System.out.println(repository.findById(""));
+        System.out.println("Find by '55ec9ad0ca450d5a90531a6' "+repository.findById("55ec9ad0ca450d5a90531a6"));
+        System.out.println("Find by '0ef98d78-8aef-4c2c-a1df-77e237b6ec9d' "+repository.findById("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d"));
         return getBeaconSubjectByBeaconMacId(beaconMacId);
     }
 
