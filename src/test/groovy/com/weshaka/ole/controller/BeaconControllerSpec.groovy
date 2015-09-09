@@ -1,10 +1,11 @@
 package com.weshaka.ole.controller;
 
-import spock.lang.Specification;
+import spock.lang.Specification
 
 class BeaconControllerSpec extends Specification {
     void "testing spock works"(){
         expect:
-            true
+        System.out.println("SPOCKTESTING...");
+        true
     }
 }
