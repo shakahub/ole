@@ -2,6 +2,7 @@ package com.weshaka.ole.repository;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static com.lordofthejars.nosqlunit.mongodb.MongoDbRule.MongoDbRuleBuilder.newMongoDbRule;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Optional;
@@ -77,8 +78,12 @@ public class BeaconSubjectRepositoryTests {
     @Test
     @UsingDataSet(locations = { "/Beacon_subject_2.json" }, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectById() {
-        final BeaconSubject beaconSubject = beaconSubjectRepository.findOne("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d");
-        System.out.println("beaconSubject=" + beaconSubject);
-        // assertNotNull(beaconSubject);
+        final Optional<BeaconSubject> beaconSubject = beaconSubjectRepositoryCustom.findBeaconSubjectByBeaconMac("C1:5C:A0:2A:EC:F0");
+        final BeaconSubject sameBeaconSubject = beaconSubjectRepository.findOne(beaconSubject.get().getId());
+        final BeaconSubject sameoldBeaconSubject = beaconSubjectRepository.findById(beaconSubject.get().getId());
+        assertNotNull(sameoldBeaconSubject);
+        assertNotNull(sameBeaconSubject);
+        assertEquals(sameBeaconSubject.getId(), beaconSubject.get().getId());
+        assertEquals(sameoldBeaconSubject.getId(), beaconSubject.get().getId());
     }
 }
