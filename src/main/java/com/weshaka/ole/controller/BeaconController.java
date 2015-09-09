@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
@@ -77,8 +78,7 @@ public class BeaconController extends CommonController {
 
     @RequestMapping("/beacons/{beaconMacId}")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
-        System.out.println("Find by '55ec9ad0ca450d5a90531a6' " + repository.findById("55ec9ad0ca450d5a90531a6"));
-        System.out.println("Find by '0ef98d78-8aef-4c2c-a1df-77e237b6ec9d' " + repository.findById("0ef98d78-8aef-4c2c-a1df-77e237b6ec9d"));
+        System.out.println("Find by '55efa8ceb6b53a5344cd77ae' " + repository.findById(new ObjectId("55efa8ceb6b53a5344cd77ae")));
         return getBeaconSubjectByBeaconMacId(beaconMacId);
     }
 
