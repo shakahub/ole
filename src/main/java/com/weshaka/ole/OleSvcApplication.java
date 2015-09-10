@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 
 import com.weshaka.ole.repository.BeaconSubjectRepository;
-import com.weshaka.ole.repository.CustomerRepository;
 
 @SpringBootApplication
 @ComponentScan({ "com.weshaka.framework", "com.weshaka.ole" })
@@ -53,9 +52,6 @@ public class OleSvcApplication /* implements CommandLineRunner */{
      * System.out.println();
      * }
      */
-
-    @Autowired
-    private CustomerRepository customerRepository;
 
     @Autowired
     private BeaconSubjectRepository repository;
