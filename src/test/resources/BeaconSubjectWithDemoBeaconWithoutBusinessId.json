@@ -1,0 +1,6 @@
+{
+    "beaconSubject":
+            [
+                {"id":{"new":false,"time":1441769678001,"timestamp":1441769679,"date":1441769678001,"timeSecond":1441769679,"machine":-1229637038,"inc":1154316207},"beaconSubjectId":"0ef98d78-8aef-4c2c-a1df-77e237b6ec9e","name":"room2","beaconSubjectType":"ConferenceRoom","location":{"longitude":223.0,"latitude":113.0,"city":"Sammamish","state":"WA","country":"USA"},"beacon":{"beaconId":"0ef98d78-8aef-4c2c-a1df-77e237b6ec9d","brand":"Adafruit","beaconType":"IBEACON","upc":"12349","powerlevel":1.0,"mac":"C1:5C:A0:2A:EC:AA","model":"kkk","color":"BLACK"}}
+            ]
+}

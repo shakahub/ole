@@ -25,6 +25,7 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 
 import com.github.fakemongo.Fongo
+import com.google.api.services.calendar.model.FreeBusyCalendar
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
@@ -74,7 +75,9 @@ class BeaconControllerSpec extends Specification {
         then:
         entity.statusCode == HttpStatus.OK
     }
-    @UsingDataSet(locations = ["/Beacon_subject_1.json"], loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = [
+        "/BeaconSubjectWithDemoBeacon.json"
+    ], loadStrategy = LoadStrategyEnum.INSERT)
     void "Should return 200 from /beacons/C1:5C:A0:2A:EC:F0!"() {
         when:
         ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/beacons/C1:5C:A0:2A:EC:F0", BeaconSubject.class)
@@ -85,7 +88,9 @@ class BeaconControllerSpec extends Specification {
         beaconSubject.getBeacon().getMac()=="C1:5C:A0:2A:EC:F0"
     }
 
-    @UsingDataSet(locations = ["/Beacon_subject_1.json"], loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = [
+        "/BeaconSubjectWithDemoBeacon.json"
+    ], loadStrategy = LoadStrategyEnum.INSERT)
     void "Should return 404 from /beacons/C1:5C:A0:2A:EC:FF!"() {
         when:
         ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/beacons/C1:5C:A0:2A:EC:FF", BeaconSubject.class)
@@ -95,7 +100,9 @@ class BeaconControllerSpec extends Specification {
         exception.statusCode==HttpStatus.NOT_FOUND
     }
 
-    @UsingDataSet(locations = ["/Beacon_subject_1.json"], loadStrategy = LoadStrategyEnum.INSERT)
+    @UsingDataSet(locations = [
+        "/BeaconSubjectWithDemoBeacon.json"
+    ], loadStrategy = LoadStrategyEnum.INSERT)
     void "Should return 400 from /beacons/C1:5C:A0:2A:EC!"() {
         when:
         ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/beacons/C1:5C:A0:2A:EC", BeaconSubject.class)
@@ -103,5 +110,17 @@ class BeaconControllerSpec extends Specification {
         then:
         final HttpClientErrorException exception = thrown()
         exception.statusCode==HttpStatus.BAD_REQUEST
+    }
+
+    @UsingDataSet(locations = [
+        "/BeaconSubjectWithDemoBeaconWithoutBusinessId.json"
+    ], loadStrategy = LoadStrategyEnum.INSERT)
+    void "Should return 404 from /beacons/C1:5C:A0:2A:EC:AA/calendar-events/free-busy!"() {
+        when:
+        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/beacons/C1:5C:A0:2A:EC:AA/calendar-events/free-busy", FreeBusyCalendar.class)
+
+        then:
+        final HttpClientErrorException exception = thrown()
+        exception.statusCode==HttpStatus.NOT_FOUND
     }
 }

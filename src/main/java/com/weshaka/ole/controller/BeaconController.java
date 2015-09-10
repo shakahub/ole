@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import org.eclipse.jgit.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
@@ -59,7 +60,7 @@ public class BeaconController extends CommonController {
         debug.print("beaconSubject={}", beaconSubject);
         String businessId = null;
         if (beaconSubject != null) {
-            businessId = beaconSubject.getBusinessId();
+            businessId = !StringUtils.isEmptyOrNull(beaconSubject.getBusinessId()) ? beaconSubject.getBusinessId() : businessId;
         }
         return Optional.ofNullable(businessId);
     }

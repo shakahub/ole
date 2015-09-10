@@ -1,6 +1,0 @@
-{
-    "beaconSubject":
-            [
-                {"id":"0ef98d78-8aef-4c2c-a1df-77e237b6ec9d","name":"room1","beaconSubjectType":"ConferenceRoom","location":{"longitude":222.0,"latitude":111.0,"city":"Sammamish","state":"WA","country":"USA"},"beacon":{"id":null,"brand":"Adafruit","beaconType":"IBEACON","upc":"12345","powerlevel":1.0,"mac":"C1:5C:A0:2A:EC:F0","model":"kkk","color":"BLACK"},"businessId":"weshaka.com_38383737363330392d363936@resource.calendar.google.com"}
-            ]
-}
