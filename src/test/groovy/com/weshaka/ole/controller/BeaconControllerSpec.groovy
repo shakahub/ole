@@ -123,4 +123,15 @@ class BeaconControllerSpec extends Specification {
         final HttpClientErrorException exception = thrown()
         exception.statusCode==HttpStatus.NOT_FOUND
     }
+    @UsingDataSet(locations = [
+        "/BeaconSubjectWithDemoBeaconWithEmptyBusinessId.json"
+    ], loadStrategy = LoadStrategyEnum.INSERT)
+    void "Again should return 404 from /beacons/C1:5C:A0:2A:EC:AB/calendar-events/free-busy!"() {
+        when:
+        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/beacons/C1:5C:A0:2A:EC:AB/calendar-events/free-busy", FreeBusyCalendar.class)
+
+        then:
+        final HttpClientErrorException exception = thrown()
+        exception.statusCode==HttpStatus.NOT_FOUND
+    }
 }
