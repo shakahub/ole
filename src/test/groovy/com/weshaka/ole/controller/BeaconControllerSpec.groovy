@@ -15,7 +15,7 @@ import com.weshaka.ole.OleSvcApplication
 
 @ActiveProfiles("prod")
 @ContextConfiguration(loader = SpringApplicationContextLoader.class, classes = OleSvcApplication.class)
-@WebIntegrationTest
+@WebIntegrationTest("server.port:8090")
 @Stepwise
 class BeaconControllerSpec extends Specification {
 
@@ -25,7 +25,7 @@ class BeaconControllerSpec extends Specification {
     }
     void "Should return 200 from /calendar-envents!"() {
         when:
-        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8080/calendar-events", String.class)
+        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/calendar-events", String.class)
 
         then:
         entity.statusCode == HttpStatus.OK
