@@ -77,6 +77,6 @@ public class Beacon {
 
     @Override
     public String toString() {
-        return String.format("Beacon[beaconId=%s,brand=%s,model=%s,type=%s,upc=%s,powerlevel=%d,mac=%s,color=%s]", beaconId, brand, model, beaconType, upc, powerlevel, mac, color);
+        return String.format("Beacon[beaconId=%s,brand=%s,model=%s,type=%s,upc=%s,powerlevel=%s,mac=%s,color=%s]", beaconId, brand, model, beaconType, upc, powerlevel, mac, color);
     }
 }

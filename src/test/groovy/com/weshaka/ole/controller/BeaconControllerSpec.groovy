@@ -31,6 +31,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule
 import com.mongodb.Mongo
+import com.weshaka.google.calendar.ole.pojo.CalendarEvent
 import com.weshaka.ole.OleSvcApplication
 import com.weshaka.ole.entity.BeaconSubject
 
@@ -86,6 +87,24 @@ class BeaconControllerSpec extends Specification {
         BeaconSubject beaconSubject = entity.getBody()
         entity.statusCode == HttpStatus.OK
         beaconSubject.getBeacon().getMac()=="C1:5C:A0:2A:EC:F0"
+    }
+
+    void "Should return 200 from /calendar-events/weshaka.com_38383737363330392d363936@resource.calendar.google.com/free-busy!"() {
+        when:
+        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/calendar-events/weshaka.com_38383737363330392d363936@resource.calendar.google.com/free-busy", FreeBusyCalendar.class)
+
+        then:
+        FreeBusyCalendar freeBusyCalendar = entity.getBody()
+        entity.statusCode == HttpStatus.OK
+    }
+
+    void "Should return 200 from /calendar-events/weshaka.com_38383737363330392d363936@resource.calendar.google.com!"() {
+        when:
+        ResponseEntity entity = new RestTemplate().getForEntity("http://localhost:8090/calendar-events/weshaka.com_38383737363330392d363936@resource.calendar.google.com", List.class)
+
+        then:
+        List<CalendarEvent> list = entity.getBody()
+        entity.statusCode == HttpStatus.OK
     }
 
     @UsingDataSet(locations = [

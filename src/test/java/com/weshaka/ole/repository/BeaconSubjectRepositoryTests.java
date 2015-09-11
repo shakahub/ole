@@ -71,7 +71,7 @@ public class BeaconSubjectRepositoryTests {
     @UsingDataSet(locations = { "/BeaconSubjectWithDemoBeacon.json" }, loadStrategy = LoadStrategyEnum.INSERT)
     public void testFindBeaconSubjectByBeaconMac() {
         final Optional<BeaconSubject> beaconSubject = beaconSubjectRepositoryCustom.findBeaconSubjectByBeaconMac("C1:5C:A0:2A:EC:F0");
-        System.out.println(beaconSubject.get().getBusinessId());
+        assertNotNull(beaconSubject.get().getBeacon().toString());
         assertNotNull(beaconSubject);
     }
 
