@@ -5,11 +5,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 
 @SpringBootApplication
-@ComponentScan({ "com.weshaka.framework", "com.weshaka.ole" })
+@EnableAsync
+@ComponentScan({ "com.weshaka.framework", "com.weshaka.ole", "com.weshaka.service" })
 @Profile("prod")
 public class OleSvcApplication /* implements CommandLineRunner */{
     public static void main(String[] args) {

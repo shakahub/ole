@@ -9,10 +9,16 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.eclipse.jgit.util.StringUtils;
@@ -22,7 +28,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.EventReminder;
 import com.google.api.services.calendar.model.Events;
 import com.google.api.services.calendar.model.FreeBusyCalendar;
 import com.google.api.services.calendar.model.FreeBusyRequest;
@@ -37,12 +47,15 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
+import com.weshaka.google.calendar.ole.pojo.CreateCalendarEventRequest;
 import com.weshaka.ole.entity.BeaconSubject;
 import com.weshaka.ole.exceptions.BeaconBusinessIDNotFoundException;
 import com.weshaka.ole.exceptions.BeaconMacIdNotValidException;
 import com.weshaka.ole.exceptions.BeaconNotFoundException;
+import com.weshaka.ole.exceptions.CalendarServiceNotResponseException;
 import com.weshaka.ole.repository.BeaconSubjectRepository;
 import com.weshaka.ole.repository.BeaconSubjectRepositoryCustom;
+import com.weshaka.service.CalendarService;
 
 /**
  * @author ema
@@ -55,6 +68,41 @@ public class BeaconController extends CommonController {
 
     @Autowired
     private BeaconSubjectRepositoryCustom repositoryCustom;
+
+    @Autowired
+    private CalendarService calendarService;
+
+    @RequestMapping(value = "/calendar-events", method = RequestMethod.POST)
+    public @ResponseBody List<CalendarEvent> createCalendarEventAPI(@RequestBody CreateCalendarEventRequest request) throws IOException, GeneralSecurityException {
+
+        final CalendarEvent calendarEvent = request.getCalendarEvent();
+        Event event = new Event().setSummary(calendarEvent.getSummary()).setLocation(calendarEvent.getLocation()).setDescription(calendarEvent.getDescription());
+        final Function<LocalDateTime, EventDateTime> convertDateTimeFunc = localDateTime -> {
+            final DateTime gLocalDateTime = new DateTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));// TODO: Change zoneId to param
+            final EventDateTime eventDateTime = new EventDateTime().setDateTime(gLocalDateTime).setTimeZone("America/Los_Angeles");// TODO: Change Timezone to param
+            return eventDateTime;
+        };
+        final EventDateTime start = convertDateTimeFunc.apply(calendarEvent.getStartDateTime());
+        event.setStart(start);
+        final EventDateTime end = convertDateTimeFunc.apply(calendarEvent.getEndDateTime());
+        event.setEnd(end);
+        event.setRecurrence(Arrays.asList(calendarEvent.getRecurrence()));
+        final List<EventAttendee> attendeesList = new ArrayList<>();
+        calendarEvent.getEventAttendees().forEach(attendee -> {
+            final EventAttendee eventAttendee = new EventAttendee().setEmail(attendee.getEmail());
+            attendeesList.add(eventAttendee);
+        });
+        event.setAttendees(attendeesList);
+        final EventReminder[] reminderOverrides = new EventReminder[] { new EventReminder().setMethod("email").setMinutes(24 * 60), new EventReminder().setMethod("popup").setMinutes(10), };
+        final Event.Reminders reminders = new Event.Reminders().setUseDefault(false).setOverrides(Arrays.asList(reminderOverrides));
+        event.setReminders(reminders);
+
+        final String calendarId = calendarEvent.getCreator().getId();
+        final com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
+        event = service.events().insert(calendarId, event).execute();
+        System.out.printf("Event created: %s\n", event.getHtmlLink());
+        return null;// TODO:to finish
+    }
 
     private Optional<String> getBeaconSubjectBusinessId(BeaconSubject beaconSubject) {
         debug.print("beaconSubject={}", beaconSubject);
@@ -83,34 +131,37 @@ public class BeaconController extends CommonController {
 
     @RequestMapping("/calendar-events")
     public @ResponseBody List<CalendarEvent> getCalendarEventsAPI() throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
-        // Note: Do not confuse this class with the
-        // com.google.api.services.calendar.model.Calendar class.
-        final com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
-        // List the next 10 events from the primary calendar.
-        final DateTime now = new DateTime(System.currentTimeMillis());
-        final Events events = service.events().list("primary").setMaxResults(10).setTimeMin(now).setOrderBy("startTime").setSingleEvents(true).execute();
-        final List<Event> items = events.getItems();
-        final List<CalendarEvent> calendarEvents = new ArrayList<>();
-        if (items.size() == 0) {
-            debug.print("No upcoming events found for {}", "default primary");
-        } else {
-            debug.print("Upcoming events {}", "default primary");
-            items.forEach(event -> {
-                final CalendarEvent e = new CalendarEvent();
-                DateTime start = event.getStart().getDateTime();
-                if (start == null) {
-                    start = event.getStart().getDate();
-                }
-                debug.print("eventStart={}" + start);
-                e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
-                final List<EventAttendee> attendees = event.getAttendees();
-                if (attendees != null)
-                    e.getEventAttendees().addAll(attendees);
-                e.setSummary(event.getSummary());
-                calendarEvents.add(e);
+        final Future<Events> futureEvents = calendarService.getPrimaryEvents("startTime", 10);
+        Events events = null;
+        try {
+            events = futureEvents.get(5000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | ExecutionException | TimeoutException e1) {
+            throw new CalendarServiceNotResponseException(e1.getMessage());
+        }
 
-            });
+        final List<CalendarEvent> calendarEvents = new ArrayList<>();
+        if (events != null) {
+            final List<Event> items = events.getItems();
+            if (items.size() == 0) {
+                debug.print("No upcoming events found for {}", "default primary");
+            } else {
+                debug.print("Upcoming events {}", "default primary");
+                items.forEach(event -> {
+                    final CalendarEvent e = new CalendarEvent();
+                    DateTime start = event.getStart().getDateTime();
+                    if (start == null) {
+                        start = event.getStart().getDate();
+                    }
+                    debug.print("eventStart={}" + start);
+                    e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
+                    final List<EventAttendee> attendees = event.getAttendees();
+                    if (attendees != null)
+                        e.getEventAttendees().addAll(attendees);
+                    e.setSummary(event.getSummary());
+                    calendarEvents.add(e);
+
+                });
+            }
         }
         return calendarEvents;
     }
@@ -208,6 +259,14 @@ class BeaconControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     VndErrors beaconNotFoundExceptionHandler(BeaconNotFoundException ex) {
         return new VndErrors("error", ex.getMessage());
+    }
+
+    @ResponseBody
+    @ExceptionHandler(CalendarServiceNotResponseException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    VndErrors calendarServiceNotResponseHandler(CalendarServiceNotResponseException ex) {
+        final VndErrors vndErrors = new VndErrors("error", ex.getMessage());
+        return vndErrors;
     }
 
 }

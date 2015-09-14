@@ -15,15 +15,20 @@ import org.springframework.context.annotation.Profile
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
+import org.springframework.http.RequestEntity
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Stepwise
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fakemongo.Fongo
 import com.google.api.services.calendar.model.FreeBusyCalendar
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet
@@ -32,6 +37,7 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule
 import com.mongodb.Mongo
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent
+import com.weshaka.google.calendar.ole.pojo.CreateCalendarEventRequest
 import com.weshaka.ole.OleSvcApplication
 import com.weshaka.ole.entity.BeaconSubject
 
@@ -105,6 +111,21 @@ class BeaconControllerSpec extends Specification {
         then:
         List<CalendarEvent> list = entity.getBody()
         entity.statusCode == HttpStatus.OK
+    }
+    @Ignore //TODO: Fix and enable
+    void "Should return 200 from /calendar-events 'POST' for creating new calendar event!"() {
+        when:
+        CreateCalendarEventRequest body = new CreateCalendarEventRequest();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode requestJson = objectMapper.readTree("""{"test":"test"}""");
+        RequestEntity request = RequestEntity.post(new URI("http://localhost:8090/calendar-events")).accept(MediaType.APPLICATION_JSON).body(requestJson);
+        RestTemplate restTemplate = new RestTemplate();
+        //restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
+        ResponseEntity<List<CalendarEvent>> response = restTemplate.exchange(request, List.class);
+
+        then:
+        List<CalendarEvent> list = response.getBody()
+        response.statusCode == HttpStatus.OK
     }
 
     @UsingDataSet(locations = [
