@@ -44,6 +44,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-redis</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jta-atomikos</artifactId>
 		</dependency>
 		<dependency>
@@ -93,6 +97,12 @@
 		<dependency>
 			<groupId>com.lordofthejars</groupId>
 			<artifactId>nosqlunit-mongodb</artifactId>
+			<version>${nosqlunit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.lordofthejars</groupId>
+			<artifactId>nosqlunit-redis</artifactId>
 			<version>${nosqlunit.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -13,15 +13,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
+import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import redis.clients.jedis.JedisPoolConfig;
 
 import com.github.fakemongo.Fongo;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -34,8 +43,43 @@ import com.weshaka.ole.entity.BeaconSubject;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = { OleSvcApplication.class }, loader = SpringApplicationContextLoader.class)
-@ActiveProfiles({ "prod", "test" })
+@ActiveProfiles({ "test" })
 public class BeaconSubjectRepositoryTests {
+    @Profile("test")
+    @Configuration
+    static class LocalRedisConfig {
+        @Bean
+        @DependsOn("redisTemplate")
+        public CacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
+            final RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+
+            // Number of seconds before expiration. Defaults to unlimited (0)
+            cacheManager.setDefaultExpiration(10);// In seconds
+            return cacheManager;
+        }
+
+        @Bean(name = "redisConnectionFactory")
+        public RedisConnectionFactory jedisConnectionFactory() {
+            final JedisPoolConfig poolConfig = new JedisPoolConfig();
+            poolConfig.setMaxTotal(10);
+            poolConfig.setMaxIdle(5);
+            poolConfig.setMinIdle(1);
+            poolConfig.setTestOnBorrow(true);
+            poolConfig.setTestOnReturn(true);
+            poolConfig.setTestWhileIdle(true);
+            final JedisConnectionFactory jedisConnectionFactory = new JedisConnectionFactory(poolConfig);
+            return jedisConnectionFactory;
+        }
+
+        @SuppressWarnings("rawtypes")
+        @Bean(name = "redisTemplate")
+        @DependsOn("redisConnectionFactory")
+        public RedisTemplate redisTemplate() {
+            final StringRedisTemplate redisTemplate = new StringRedisTemplate(jedisConnectionFactory());
+            return redisTemplate;
+        }
+    }
+
     @Profile("test")
     @Configuration
     @EnableMongoRepositories

@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.jgit.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.hateoas.VndErrors;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -125,6 +126,7 @@ public class BeaconController extends CommonController {
     }
 
     @RequestMapping("/beacons/{beaconMacId}")
+    @Cacheable("beacon")
     public @ResponseBody BeaconSubject getBeaconSubjectByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException {
         return getBeaconSubjectByBeaconMacId(beaconMacId);
     }
