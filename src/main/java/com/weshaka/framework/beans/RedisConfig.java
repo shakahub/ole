@@ -34,7 +34,7 @@ public class RedisConfig extends CachingConfigurerSupport {
         final RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
 
         // Number of seconds before expiration. Defaults to unlimited (0)
-        cacheManager.setDefaultExpiration(10);// In seconds
+        cacheManager.setDefaultExpiration(120);// In seconds
         return cacheManager;
     }
 
