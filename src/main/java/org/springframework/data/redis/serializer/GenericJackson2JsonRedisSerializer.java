@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping;
 import com.fasterxml.jackson.databind.ser.SerializerFactory;
@@ -41,7 +42,7 @@ public class GenericJackson2JsonRedisSerializer implements RedisSerializer<Objec
      * Setting a custom-configured {@link ObjectMapper} is one way to take further control of the JSON serialization
      * process. For example, an extended {@link SerializerFactory} can be configured that provides custom serializers for
      * specific types.
-     * 
+     *
      * @param mapper
      *            must not be {@literal null}.
      */
@@ -54,7 +55,7 @@ public class GenericJackson2JsonRedisSerializer implements RedisSerializer<Objec
     /**
      * Creates {@link GenericJackson2JsonRedisSerializer} and configures {@link ObjectMapper} for default typing using the
      * given {@literal name}. In case of an {@literal empty} or {@literal null} String the default {@link JsonTypeInfo.Id#CLASS} will be used.
-     * 
+     *
      * @param classPropertyTypeName
      *            Name of the JSON property holding type information. Can be {@literal null}.
      */
@@ -67,6 +68,7 @@ public class GenericJackson2JsonRedisSerializer implements RedisSerializer<Objec
         } else {
             mapper.enableDefaultTyping(DefaultTyping.NON_FINAL, As.PROPERTY);
         }
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     /*
