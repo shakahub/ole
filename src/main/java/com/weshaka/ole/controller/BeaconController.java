@@ -168,8 +168,14 @@ public class BeaconController extends CommonController {
         return calendarEvents;
     }
 
-    @RequestMapping("/calendar-events/{calendarId:.+}")
-    public @ResponseBody List<CalendarEvent> getCalendarEventsByCalendarIdAPI(@PathVariable("calendarId") String calendarId) throws IOException, GeneralSecurityException {
+    @RequestMapping("/beacons/{beaconMacId}/calendar-events")
+    public @ResponseBody List<CalendarEvent> getCalendarEventsByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException, GeneralSecurityException {
+        final BeaconSubject beaconSubject = getBeaconSubjectByBeaconMacId(beaconMacId);
+        final String beaconSubjectBusinessId = getBeaconSubjectBusinessId(beaconSubject).orElseThrow(() -> new BeaconBusinessIDNotFoundException(beaconMacId)); // exception
+        return getCalendarEventsByCalendarId(beaconSubjectBusinessId);
+    }
+
+    private List<CalendarEvent> getCalendarEventsByCalendarId(String calendarId) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         // Note: Do not confuse this class with the
         // com.google.api.services.calendar.model.Calendar class.
@@ -202,6 +208,11 @@ public class BeaconController extends CommonController {
         return calendarEvents;
     }
 
+    @RequestMapping("/calendar-events/{calendarId:.+}")
+    public @ResponseBody List<CalendarEvent> getCalendarEventsByCalendarIdAPI(@PathVariable("calendarId") String calendarId) throws IOException, GeneralSecurityException {
+        return getCalendarEventsByCalendarId(calendarId);
+    }
+
     @RequestMapping("/beacons/{beaconMacId}/calendar-events/free-busy")
     public @ResponseBody FreeBusyCalendar getCalendarEventsFreeBusyByBeaconMacIdAPI(@PathVariable("beaconMacId") String beaconMacId) throws IOException, GeneralSecurityException {
         final BeaconSubject beaconSubject = getBeaconSubjectByBeaconMacId(beaconMacId);
@@ -230,7 +241,8 @@ public class BeaconController extends CommonController {
         fbreq.setItems(fbreqItems);
         final FreeBusyResponse fbres = service.freebusy().query(fbreq).execute();
         final Map<String, FreeBusyCalendar> m = fbres.getCalendars();
-        return m.get(calendarId);
+        final FreeBusyCalendar freeBusyCalendar = m.get(calendarId);
+        return freeBusyCalendar;
     }
 
     @RequestMapping("/calendar-events/{calendarId:.+}/free-busy")
