@@ -48,6 +48,7 @@ import com.google.api.services.calendar.model.FreeBusyRequestItem;
 import com.google.api.services.calendar.model.FreeBusyResponse;
 import com.weshaka.google.calendar.ole.CalendarServiceFactory;
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent;
+import com.weshaka.google.calendar.ole.pojo.CalendarEventCreator;
 import com.weshaka.google.calendar.ole.pojo.CreateCalendarEventRequest;
 import com.weshaka.ole.entity.BeaconSubject;
 import com.weshaka.ole.exceptions.BeaconBusinessIDNotFoundException;
@@ -197,12 +198,24 @@ public class BeaconController extends CommonController {
                     start = event.getStart().getDate();
                 }
                 e.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
+                DateTime end = event.getEnd().getDateTime();
+                if (end == null) {
+                    end = event.getEnd().getDate();
+                }
+                e.setEndDateTime(LocalDateTime.ofInstant((new Date(end.getValue())).toInstant(), ZoneId.systemDefault()));
                 final List<EventAttendee> attendees = event.getAttendees();
                 if (attendees != null)
                     e.getEventAttendees().addAll(attendees);
                 e.setSummary(event.getSummary());
+                final CalendarEventCreator creator = new CalendarEventCreator();
+                if (event.getCreator() != null) {
+                    creator.setEmail(event.getCreator().getEmail());
+                    creator.setId(event.getCreator().getId());
+                }
+                e.setCreator(creator);
+                if (event.getRecurrence() != null)
+                    e.setRecurrence(event.getRecurrence().stream().toArray(String[]::new));
                 calendarEvents.add(e);
-
             });
         }
         return calendarEvents;
