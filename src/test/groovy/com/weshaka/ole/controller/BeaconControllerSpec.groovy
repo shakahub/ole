@@ -34,7 +34,6 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule
 import com.lordofthejars.nosqlunit.mongodb.SpringMongoDbRule
 import com.weshaka.google.calendar.ole.pojo.CalendarEvent
-import com.weshaka.google.calendar.ole.pojo.CreateCalendarEventRequest
 import com.weshaka.ole.OleSvcApplication
 import com.weshaka.ole.entity.BeaconSubject
 
@@ -100,16 +99,63 @@ class BeaconControllerSpec extends Specification {
     @Ignore //TODO: Fix and enable
     void "Should return 200 from /calendar-events 'POST' for creating new calendar event!"() {
         when:
-        CreateCalendarEventRequest body = new CreateCalendarEventRequest();
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode requestJson = objectMapper.readTree("""{"test":"test"}""");
-        RequestEntity request = RequestEntity.post(new URI("http://localhost:8090/calendar-events")).accept(MediaType.APPLICATION_JSON).body(requestJson);
-        RestTemplate restTemplate = new RestTemplate();
+        //        CreateCalendarEventRequest body = new CreateCalendarEventRequest()
+        //        CalendarEvent calendarEvent = new CalendarEvent()
+        //        CalendarEventCreator calendarEventCreator = new CalendarEventCreator()
+        //        calendarEventCreator.setEmail("admin@weshaka.com")
+        //        calendarEventCreator.setId("admin")
+        //        calendarEvent.setCreator(calendarEventCreator)
+        //        calendarEvent.setDescription("This is description")
+        //        calendarEvent.setLocation("Rainier Location")
+        //        calendarEvent.setSummary("This is summary")
+        //        String startTime = "2015-10-12T10:00:00";
+        //        String endTime = "2015-10-12T11:00:00";
+        //        LocalDateTime startTimeLocal = LocalDateTime.parse(startTime)
+        //        LocalDateTime endTimeLocal =LocalDateTime.parse(endTime)
+        //        calendarEvent.setStartDateTime(startTimeLocal)
+        //        calendarEvent.setEndDateTime(endTimeLocal)
+        //        List<EventAttendee> eventAttendees = new ArrayList<>()
+        //        EventAttendee eventAttendee = new EventAttendee()
+        //        eventAttendee.setId("admin")
+        //        eventAttendee.setComment("This is comment")
+        //        eventAttendees.add(eventAttendee)
+        //        calendarEvent.setEventAttendees(eventAttendees)
+        //        body.setCalendarEvent(calendarEvent)
+        ObjectMapper objectMapper = new ObjectMapper()
+        String jsonString = objectMapper.readTree("""
+{
+  "calendarEvent": {
+  "summary": "Google I/O 2015",
+  "location": "Rainier",
+  "description": "A chance to hear more about Google developer products.",
+  "startDateTime": [
+2015,10,10,8,0,0,0
+],
+  "endDateTime": [
+2015,10,10,10,0,0,0
+],
+  "eventAttendees": [
+    {"email": "admin@weshaka.com"},
+    {"email": "yixing@gmail.com"}
+],
+"creator":{
+"email":"admin@weshaka.com",
+"id":"admin@weshaka.com"
+},
+"recurrence": [
+"RRULE:FREQ=DAILY;COUNT=2"
+]
+}
+}""")
+        System.out.println("jsonString="+jsonString)
+        JsonNode requestJson = objectMapper.readTree(jsonString)
+        RequestEntity request = RequestEntity.post(new URI("http://localhost:8090/calendar-events")).accept(MediaType.APPLICATION_JSON).body(requestJson)
+        RestTemplate restTemplate = new RestTemplate()
         //restTemplate.getMessageConverters().add(new StringHttpMessageConverter());
-        ResponseEntity<List<CalendarEvent>> response = restTemplate.exchange(request, List.class);
+        ResponseEntity<CalendarEvent> response = restTemplate.exchange(request, CalendarEvent.class)
 
         then:
-        List<CalendarEvent> list = response.getBody()
+        CalendarEvent calendarEventResponse = response.getBody()
         response.statusCode == HttpStatus.OK
     }
 

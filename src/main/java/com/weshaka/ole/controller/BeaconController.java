@@ -75,9 +75,13 @@ public class BeaconController extends CommonController {
     private CalendarService calendarService;
 
     @RequestMapping(value = "/calendar-events", method = RequestMethod.POST)
-    public @ResponseBody List<CalendarEvent> createCalendarEventAPI(@RequestBody CreateCalendarEventRequest request) throws IOException, GeneralSecurityException {
+    public @ResponseBody CalendarEvent createCalendarEventAPI(@RequestBody CreateCalendarEventRequest request) throws IOException, GeneralSecurityException {
 
         final CalendarEvent calendarEvent = request.getCalendarEvent();
+        System.out.println("HHHH" + calendarEvent);
+        System.out.println(calendarEvent.getSummary());
+        System.out.println(calendarEvent.getDescription());
+        System.out.println(calendarEvent.getLocation());
         Event event = new Event().setSummary(calendarEvent.getSummary()).setLocation(calendarEvent.getLocation()).setDescription(calendarEvent.getDescription());
         final Function<LocalDateTime, EventDateTime> convertDateTimeFunc = localDateTime -> {
             final DateTime gLocalDateTime = new DateTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));// TODO: Change zoneId to param
@@ -103,7 +107,7 @@ public class BeaconController extends CommonController {
         final com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
         event = service.events().insert(calendarId, event).execute();
         System.out.printf("Event created: %s\n", event.getHtmlLink());
-        return null;// TODO:to finish
+        return calendarEvent;
     }
 
     private Optional<String> getBeaconSubjectBusinessId(BeaconSubject beaconSubject) {
