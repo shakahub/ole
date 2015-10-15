@@ -78,10 +78,6 @@ public class BeaconController extends CommonController {
     public @ResponseBody CalendarEvent createCalendarEventAPI(@RequestBody CreateCalendarEventRequest request) throws IOException, GeneralSecurityException {
 
         final CalendarEvent calendarEvent = request.getCalendarEvent();
-        System.out.println("HHHH" + calendarEvent);
-        System.out.println(calendarEvent.getSummary());
-        System.out.println(calendarEvent.getDescription());
-        System.out.println(calendarEvent.getLocation());
         Event event = new Event().setSummary(calendarEvent.getSummary()).setLocation(calendarEvent.getLocation()).setDescription(calendarEvent.getDescription());
         final Function<LocalDateTime, EventDateTime> convertDateTimeFunc = localDateTime -> {
             final DateTime gLocalDateTime = new DateTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));// TODO: Change zoneId to param
@@ -92,7 +88,8 @@ public class BeaconController extends CommonController {
         event.setStart(start);
         final EventDateTime end = convertDateTimeFunc.apply(calendarEvent.getEndDateTime());
         event.setEnd(end);
-        event.setRecurrence(Arrays.asList(calendarEvent.getRecurrence()));
+        if (calendarEvent.getRecurrence() != null)
+            event.setRecurrence(Arrays.asList(calendarEvent.getRecurrence()));
         final List<EventAttendee> attendeesList = new ArrayList<>();
         calendarEvent.getEventAttendees().forEach(attendee -> {
             final EventAttendee eventAttendee = new EventAttendee().setEmail(attendee.getEmail());
