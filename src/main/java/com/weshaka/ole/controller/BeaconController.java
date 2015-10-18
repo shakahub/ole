@@ -80,7 +80,7 @@ public class BeaconController extends CommonController {
         final CalendarEvent calendarEvent = request.getCalendarEvent();
         Event event = new Event().setSummary(calendarEvent.getSummary()).setLocation(calendarEvent.getLocation()).setDescription(calendarEvent.getDescription());
         final Function<LocalDateTime, EventDateTime> convertDateTimeFunc = localDateTime -> {
-            final DateTime gLocalDateTime = new DateTime(Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant()));// TODO: Change zoneId to param
+            final DateTime gLocalDateTime = new DateTime(Date.from(localDateTime.atZone(ZoneId.of("America/Los_Angeles")).toInstant()));// TODO: Change zoneId to param
             final EventDateTime eventDateTime = new EventDateTime().setDateTime(gLocalDateTime).setTimeZone("America/Los_Angeles");// TODO: Change Timezone to param
             return eventDateTime;
         };
@@ -90,12 +90,7 @@ public class BeaconController extends CommonController {
         event.setEnd(end);
         if (calendarEvent.getRecurrence() != null)
             event.setRecurrence(Arrays.asList(calendarEvent.getRecurrence()));
-        final List<EventAttendee> attendeesList = new ArrayList<>();
-        calendarEvent.getEventAttendees().forEach(attendee -> {
-            final EventAttendee eventAttendee = new EventAttendee().setEmail(attendee.getEmail());
-            attendeesList.add(eventAttendee);
-        });
-        event.setAttendees(attendeesList);
+        event.setAttendees(calendarEvent.getEventAttendees());
         final EventReminder[] reminderOverrides = new EventReminder[] { new EventReminder().setMethod("email").setMinutes(24 * 60), new EventReminder().setMethod("popup").setMinutes(10), };
         final Event.Reminders reminders = new Event.Reminders().setUseDefault(false).setOverrides(Arrays.asList(reminderOverrides));
         event.setReminders(reminders);
