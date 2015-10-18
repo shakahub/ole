@@ -99,6 +99,41 @@ public class BeaconController extends CommonController {
         final com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
         event = service.events().insert(calendarId, event).execute();
         System.out.printf("Event created: %s\n", event.getHtmlLink());
+
+        return calendarEvent;
+    }
+
+    @RequestMapping(value = "/calendar-events/{calendarId}/{eventId}", method = RequestMethod.DELETE)
+    public @ResponseBody CalendarEvent deleteCalendarEventAPI(@PathVariable("calendarId") String calendarId, @PathVariable("eventId") String eventId) throws IOException, GeneralSecurityException {
+        final com.google.api.services.calendar.Calendar service = CalendarServiceFactory.getCalendarService();
+        final Event event = service.events().get(calendarId, eventId).execute();
+        service.events().delete(calendarId, eventId).execute();
+        // TODO: Selma
+        final CalendarEvent calendarEvent = new CalendarEvent();
+        calendarEvent.getEventAttendees().addAll(event.getAttendees());
+        calendarEvent.setDescription(event.getDescription());
+        DateTime start = event.getStart().getDateTime();
+        if (start == null) {
+            start = event.getStart().getDate();
+        }
+        calendarEvent.setStartDateTime(LocalDateTime.ofInstant((new Date(start.getValue())).toInstant(), ZoneId.systemDefault()));
+        DateTime end = event.getEnd().getDateTime();
+        if (end == null) {
+            end = event.getEnd().getDate();
+        }
+        calendarEvent.setEndDateTime(LocalDateTime.ofInstant((new Date(end.getValue())).toInstant(), ZoneId.systemDefault()));
+        calendarEvent.setEventId(eventId);
+        calendarEvent.setLocation(event.getLocation());
+        calendarEvent.setSummary(event.getSummary());
+        final CalendarEventCreator creator = new CalendarEventCreator();
+        if (event.getCreator() != null) {
+            creator.setEmail(event.getCreator().getEmail());
+            creator.setId(event.getCreator().getId());
+        }
+        calendarEvent.setCreator(creator);
+        if (event.getRecurrence() != null)
+            calendarEvent.setRecurrence(event.getRecurrence().stream().toArray(String[]::new));
+        calendarEvent.setEventId(event.getId());
         return calendarEvent;
     }
 
@@ -157,8 +192,8 @@ public class BeaconController extends CommonController {
                     if (attendees != null)
                         e.getEventAttendees().addAll(attendees);
                     e.setSummary(event.getSummary());
+                    e.setEventId(event.getId());
                     calendarEvents.add(e);
-
                 });
             }
         }
@@ -211,6 +246,7 @@ public class BeaconController extends CommonController {
                 e.setCreator(creator);
                 if (event.getRecurrence() != null)
                     e.setRecurrence(event.getRecurrence().stream().toArray(String[]::new));
+                e.setEventId(event.getId());
                 calendarEvents.add(e);
             });
         }

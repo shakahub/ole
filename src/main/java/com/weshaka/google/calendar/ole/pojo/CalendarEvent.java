@@ -21,6 +21,7 @@ public class CalendarEvent {
     private LocalDateTime endDateTime;
     private List<EventAttendee> eventAttendees;
     private String[] recurrence;
+    private String eventId;
 
     public CalendarEventCreator getCreator() {
         return creator;
@@ -39,6 +40,10 @@ public class CalendarEvent {
             this.eventAttendees = new ArrayList<>();
         }
         return this.eventAttendees;
+    }
+
+    public String getEventId() {
+        return eventId;
     }
 
     public String getLocation() {
@@ -71,6 +76,10 @@ public class CalendarEvent {
 
     public void setEventAttendees(List<EventAttendee> eventAttendees) {
         this.eventAttendees = eventAttendees;
+    }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     public void setLocation(String location) {
